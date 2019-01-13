@@ -1,0 +1,3 @@
+[05-Jun-2017 11:38:09 UTC] PHP Fatal error:  Class 'Validation' not found in /home/shaildeveloper/public_html/website/client/kmumbai/carpediemsocial.com/mobileapp/ajax.php on line 3
+[05-Jun-2017 11:38:12 UTC] PHP Fatal error:  Class 'Validation' not found in /home/shaildeveloper/public_html/website/client/kmumbai/carpediemsocial.com/mobileapp/ajax.php on line 3
+[05-Jun-2017 11:39:18 UTC] PHP Fatal error:  Call to undefined function msg() in /home/shaildeveloper/public_html/website/client/kmumbai/carpediemsocial.com/mobileapp/ajax.php on line 24

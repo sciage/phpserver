@@ -6,7 +6,6 @@
  * Time: 7:35 AM
  */
 
-//require_once("init_new_config.php");
 require_once("init_new_config.php");
 require_once("send_notif.php");
 require_once("save_notification.php");
@@ -49,12 +48,7 @@ function send_notification_to_comment_owner($user_id, $post_id, $topic, $id_post
             $text_status_new =    substr($text_status, 0, 40) . "...";
         }
 
-        // $id_user_name = $getUserId->fetch_object()->id_user_name;
-        // $groups_name = $getUserId->fetch_object()->group_name;
-
-        // live code    $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$id_user_name'")or die(mysqli_error($con));
-        // demo code for testing
-        $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$user_id'")or die(mysqli_error($con));
+        $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$id_user_name'")or die(mysqli_error($con));
 
         $pushnotificationToken = $getToken->fetch_object()->pushnotificationToken;
 
@@ -100,28 +94,20 @@ function send_notification_to_comment_owner($user_id, $post_id, $topic, $id_post
         );
 
         //$senderId, $receiverId, $notificationText, $time, $post_id, $randomsenderId, $randomreceiverId
-        // live code
-        //    save_notification($user_id, $id_user_name, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
-        // todo testing code below
-        save_notification($user_id, $user_id, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
 
         // live code
         if ($user_id != $id_user_name){
-            //     $fcm_result = sendFCM($pushnotificationToken , $notification, $notification_data);
-            //      save_notification($user_id, $id_user_name, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
-
+                 $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
+                 save_notification($user_id, $id_user_name, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
         }
 
         $topic_string = "/topics/" ."POST"."_". $post_id; // "topic/POST_123
 
 
         // todo testing code below
-        $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
         $fcm_result_broadcast = sendFCM($topic_string , $notificationTopic, $textNotificationTopic);
 
-
-        $resp = array('userId' => $id_user_name);
-
+        $resp = array('success' => true);
 
 
     }

@@ -10,7 +10,7 @@
 require_once("init_new_config.php");
 require_once("send_notif.php");
 
-function send_notification_to_chat_owner($id_conversation_reply, $chatText, $chatImage, $post_id, $topic, $id_user_name, $RANDOM_RECEIVER_USERNAME, $RANDOM_RECEIVER_ID, $RECEIVER_USERID){
+function send_notification_to_chat_owner($id_conversation_reply, $chatText, $chatImage, $post_id, $topic, $id_user_name, $RANDOM_RECEIVER_USERNAME, $avatar_url, $RANDOM_RECEIVER_ID, $RECEIVER_USERID){
     global $con;
 
        // $id_user_name = $getUserId->fetch_object()->id_user_name;
@@ -31,6 +31,7 @@ function send_notification_to_chat_owner($id_conversation_reply, $chatText, $cha
             "chatText" => $chatText,
             "chatImage" => $chatImage,
             "RANDOM_RECEIVER_USERNAME" => $RANDOM_RECEIVER_USERNAME,
+            "RANDOM_RECEIVER_AVATAR" => $avatar_url,
             "RANDOM_RECEIVER_ID" => $RANDOM_RECEIVER_ID,
             "POSTID" => $post_id,
             "RECEIVER_USERID" => $id_user_name,
@@ -51,6 +52,7 @@ function send_notification_to_chat_owner($id_conversation_reply, $chatText, $cha
 
         // live code
           if ($id_user_name != $RECEIVER_USERID){
+
               $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
           }
 

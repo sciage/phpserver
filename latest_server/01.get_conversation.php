@@ -4,58 +4,40 @@ require "init_new_config_local.php";
 
 $q = mysqli_query($con, "SELECT senderId,receiverId FROM candid_database.conversation");
 
+$i=mysqli_real_escape_string($con,$_GET['i']);
+
 $records = array();
 
-while ($row = mysqli_fetch_assoc($q)) {
+$i = 1;
+
+while ($row = mysqli_fetch_array($q, MYSQLI_ASSOC)) {
     $records[] = array(
         $first = $row['senderId'],
         $second = $row['receiverId']
     );
 
-    $query = mysqli_query($con, "SELECT * FROM candid_database.conversation where case when senderId = $first then senderId = $first and receiverId = $second end");
+    mysqli_query($con,"SET SQL_SAFE_UPDATES = 0");
 
-    $querySecond = mysqli_query($con, "SELECT * FROM candid_database.conversation where case when senderId = $second then senderId = $second and receiverId = $first end");
 
-if($query->num_rows  > 0){
-    while($row = mysqli_fetch_assoc($query)){
-        $json[] = array(
-            "id_conversation"=> $row['id_conversation'],
-            "senderId"=> $row['senderId'] ,
-            "senderRandom"=> $row['senderRandom'] ,
-            "receiverId"=> $row['receiverId'],
-            "receiverRandom"=> $row['receiverRandom'],
-            "id_posts"=> $row['id_posts'],
-            "time"=> $row['time']
-        );
+    $id_conversationd = mysqli_query($con, "SELECT id_conversation FROM candid_database.conversation where senderId = $second and receiverId = $first");
+
+    $id_conversation = $id_conversationd->fetch_object()->id_conversation;
+
+    if ($id_conversation != null){
+        $delete = mysqli_query($con, "DELETE FROM `candid_database`.`conversation` WHERE (`id_conversation` = '$id_conversation')");
+        break;
     }
 
-    if($querySecond->num_rows  > 0){
-        while($row = mysqli_fetch_assoc($querySecond)){
-            $json[] = array(
-                "id_conversation"=> $row['id_conversation'],
-                "senderId"=> $row['senderId'] ,
-                "senderRandom"=> $row['senderRandom'] ,
-                "receiverId"=> $row['receiverId'],
-                "receiverRandom"=> $row['receiverRandom'],
-                "id_posts"=> $row['id_posts'],
-                "time"=> $row['time']
-            );
-        }
-    }
+    $i++;
 
+    mysqli_free_result($result);
 
 
 }
+$page = $_SERVER['PHP_SELF'];
+$sec = "0";
+header("Refresh: $sec; url=$page?i=$i");
 
-
-
-
-}
-
-$fp = fopen('final.json', 'w+');
-fwrite($fp, json_encode($json));
-fclose($fp);
-//die(json_encode($json));
 
 
 

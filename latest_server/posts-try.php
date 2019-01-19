@@ -1,9 +1,14 @@
 <?php
-require "init_new_config.php";
+require "init_new_config_local.php";
 require "all_arrays.php";
 
 
 $limit_clause = '';
+global $random_names;
+global $random_avatar;
+global $numbers;
+
+$search_word=  isset($_GET['search_word']) ? $_GET['search_word'] : '';
 
 $page1=  isset($_GET['page']) ? $_GET['page'] : '';
 if ($page1 != '') {
@@ -39,7 +44,12 @@ else if(!empty($_GET['filtered']) && !empty($_GET['id_user_name'])){ /*group pos
 }
 else if(!empty($_GET['facebookId']) && !empty($_GET['id_user_name'])){
     $sql = "SELECT id_posts	FROM posts WHERE id_user_name IN (SELECT id_user_name FROM user_name WHERE userid IN (SELECT DISTINCT facebook_id	FROM facebook_friend_id	WHERE id_user_name =  '".$_GET['id_user_name']."'))";
-} /* else if(!empty($_GET['popularPostId'])){
+}   else if(!empty($_GET['premium'])){
+    $sql02 = "SELECT id_posts FROM candid_database.posts left join user_name on posts.id_user_name = user_name.id_user_name where (group_id = '?' and gender = '?' and user_date_of_birth = '?' and text_status like '?') ";
+
+}
+
+/* else if(!empty($_GET['popularPostId'])){
     $sql = "SELECT id_posts FROM posts WHERE id_posts IN (SELECT post_id as id_posts FROM specific_post order by id_specific_post)";
 } */
 
@@ -54,7 +64,51 @@ if($sql != ""){
         }
     }
 }
+if($sql02 != ""){
+
+    if ($stmt = $con->prepare($sql02)) {
+
+        /* bind parameters for markers */
+
+        $search_word = '%' . $search_word . '%';
+        $stmt->bind_param("iiis", intval($_GET['group_id']), intval($_GET['gender']), intval($_GET['user_date_of_birth']), $search_word);
+
+        /* execute query */
+        $stmt->execute();
+
+        /* bind result variables */
+        $stmt->bind_result($id_posts);
+
+        /* fetch value */
+        if($stmt->num_rows > 0) {
+            while ($stmt->fetch()) {
+                $post_ids[] = $id_posts;
+            }
+        }
+        /* close statement */
+        $stmt->close();
+    }
+}
+
+/* if($sql02 != ""){
+    $sql02 = $sql02 .  $limit_clause;
+
+    $stmt = mysqli_prepare($con, $sql02);
+
+    $stmt->bind_param("ssss", intval($_GET['group_id']), intval($_GET['gender']), intval($_GET['user_date_of_birth']), $search_word);
+    $stmt->execute();
+    $stmt->bind_result( $id_posts);
+
+    if($stmt->num_rows > 0) {
+        while ($stmt->fetch()) {
+            $post_ids[] = $id_posts;
+        }
+    }
+} */
+
 $post_ids = implode(",", $post_ids);
+
+$post_filter = "";
 
 if ($post_ids != "") {
     $post_filter = "WHERE posts.id_posts IN  ($post_ids)";
@@ -83,7 +137,7 @@ posts.isImage as isImage,   posts.image_url as image_url,  posts.type as type,
 posts.id_categories as category, posts.report_abuse_count, 
 posts.id_user_name_random as id_user_name_random, groups.name as name,  
 (SELECT feeling_likes FROM feeling_category WHERE id_user_name= $user_id and 
-feeling_category.id_posts = posts.id_posts) as feeling_like, (SELECT count(feeling_likes) 
+feeling_category.id_posts = posts.id_posts limit 1) as feeling_like, (SELECT count(feeling_likes) 
 FROM feeling_category WHERE feeling_category.id_posts = posts.id_posts and feeling_likes = 1) as likes,  
 (SELECT count(feeling_likes) FROM feeling_category WHERE feeling_category.id_posts = posts.id_posts 
 and feeling_likes = 2) as hug, (SELECT count(post_comments.id_post_comments) as comments 
@@ -105,28 +159,33 @@ if($result){
             $row['user_name_random'] = $random_names[$row['id_user_name_random']];
             $row['avatar_url_random'] = $random_avatar[$row['id_user_name_random']];
             $row['category'] = $numbers[$row['category']];
-            $row['user_like'] = false;
-            $row['user_Huge'] = false;
             if($row['feeling_like'] == 1){
                 $row['user_like'] = true;
-            }else{
+            } else {
+                $row['user_like'] = false;
+
+            }
+
+            if ($row['feeling_like'] == 2){
+                $row['user_Huge'] = true;
+            } else {
                 $row['user_Huge'] = false;
             }
-            $post_id = $row['id_posts'];
 
-            /*      $qu = mysqli_query($con, "SELECT post_comments.message as post_comment, post_comments.id_user_name_random as comment_random_id FROM post_comments LEFT JOIN post_comment_reply ON post_comment_reply.id_post_comments=post_comments.id_post_comments where post_comments.id_posts='" . $post_id . "' group by post_comments.id_post_comments") or die(mysqli_error());
 
-                  $row_cmt = mysqli_fetch_assoc($qu);
-                  if(!empty($row_cmt)){
-                      foreach ($row_cmt as $key => $val) {
-                          $row[$key] = $val;
-                          if ($row[$key] == "comment_random_id"){
-                              $row['comment_reply'] = $random_names[$row[$val]];
-                              $row['comment_avatar'] = $random_avatar[$row[$val]];
-                          }
+         /*    $qu = mysqli_query($con, "SELECT post_comments.message as post_comment, post_comments.id_user_name_random as comment_random_id FROM post_comments LEFT JOIN post_comment_reply ON post_comment_reply.id_post_comments=post_comments.id_post_comments where post_comments.id_posts='" . $post_id . "' group by post_comments.id_post_comments") or die(mysqli_error());
 
-                      }
-                  } */
+            $row_cmt = mysqli_fetch_assoc($qu);
+            if(!empty($row_cmt)){
+                foreach ($row_cmt as $key => $val) {
+                    $row[$key] = $val;
+                    if ($row[$key] == "comment_random_id"){
+                        $row['comment_reply'] = $random_names[$row[$val]];
+                        $row['comment_avatar'] = $random_avatar[$row[$val]];
+                    }
+
+                }
+            } */
             $records[] = $row;
         }
     }

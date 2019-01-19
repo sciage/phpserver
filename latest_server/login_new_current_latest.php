@@ -78,7 +78,7 @@ if(mysqli_num_rows($checkBlock)>0){
                 //   return_responce(true, array('user' => $user), "Success", $action = "");
             }
         }else{
-            $sql = "SELECT `id_user_name` FROM `user_name` WHERE `deviceId` ='$deviceId' limit 1";
+            $sql = "SELECT * FROM `user_name` WHERE `deviceId` ='$deviceId' limit 1";
             $result = $con->query($sql);
             if($result){
                 if($result->num_rows > 0){

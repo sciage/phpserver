@@ -20,16 +20,15 @@ $query = mysqli_query($con, "SELECT c.id_conversation,u.username
                     THEN c.senderRandom= u.id_user_name_random
                     END 
                     AND ( c.senderId ='$user_one' OR c.receiverId ='$user_one')
-                    Order by c.id_conversation DESC Limit 20");
+                    Order by c.id_conversation DESC");
 
 
 $json=array();
 
-
 while($row = mysqli_fetch_assoc($query)){
 
      $id_conversation = $row['id_conversation'];
-        $random_name = $row['random_name'];
+        $random_name = $row['username'];
 
     $cquery = mysqli_query($con, "SELECT R.id_conversation_reply, conversation.id_posts, 
 (Select sum(unread) as unread from conversation_reply where conversation_reply.id_conversation = $id_conversation and conversation_reply.id_user_name != $user_one) as unread,

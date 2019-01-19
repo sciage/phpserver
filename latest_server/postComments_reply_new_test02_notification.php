@@ -4,11 +4,8 @@ require_once("update_user_token.php");
 require_once("send_notification_commentreply_owner.php");
 
 
-$id_post_comments = isset($_POST['id_post_comments']) ? mysqli_real_escape_string($con, $_POST['id_post_comments']) : ""; // id of the comment who got reply
 $id_user_name = isset($_POST['id_user_name']) ? mysqli_real_escape_string($con, $_POST['id_user_name']) : "";  // id of the user who commented the post
-$id_post_user_name = isset($_POST['id_post_user_name']) ? mysqli_real_escape_string($con, $_POST['id_post_user_name']) : "";  // who posted the post
 $id_posts = isset($_POST['id_posts']) ? mysqli_real_escape_string($con, $_POST['id_posts']) : ""; // id of the post
-$message = isset($_POST['message']) ? mysqli_real_escape_string($con, $_POST['message']) : "";
 $id_post_comments_reply = isset($_POST['id_post_comments_reply']) ? mysqli_real_escape_string($con, $_POST['id_post_comments_reply']) : "";
 $token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token']) : "0";
 
@@ -19,6 +16,11 @@ $token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token'
 
 // send notification to post owner
     $send_notification_comment_owner = send_notification_to_comment_owner($id_user_name, $id_posts, $topic, $id_post_comments_reply); // it returns back user ID
+
+
+$resp = array('success' => true);
+
+echo json_encode($resp);
 
     die();
 

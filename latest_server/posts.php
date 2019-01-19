@@ -8,6 +8,8 @@ global $random_names;
 global $random_avatar;
 global $numbers;
 
+$search_word=  isset($_GET['search_word']) ? $_GET['search_word'] : '';
+
 $page1=  isset($_GET['page']) ? $_GET['page'] : '';
 if ($page1 != '') {
     $page = $page1;
@@ -42,7 +44,12 @@ else if(!empty($_GET['filtered']) && !empty($_GET['id_user_name'])){ /*group pos
 }
 else if(!empty($_GET['facebookId']) && !empty($_GET['id_user_name'])){
     $sql = "SELECT id_posts	FROM posts WHERE id_user_name IN (SELECT id_user_name FROM user_name WHERE userid IN (SELECT DISTINCT facebook_id	FROM facebook_friend_id	WHERE id_user_name =  '".$_GET['id_user_name']."'))";
-} /* else if(!empty($_GET['popularPostId'])){
+}   else if(!empty($_GET['premium'])){
+    $sql = "SELECT id_posts FROM candid_database.posts left join user_name on posts.id_user_name = user_name.id_user_name where (group_id = '" . intval($_GET['group_id']) . "' and gender = '" . intval($_GET['gender']) . "' and user_date_of_birth = '" . intval($_GET['user_date_of_birth']) . "' and text_status like '%what%') ";
+
+}
+
+/* else if(!empty($_GET['popularPostId'])){
     $sql = "SELECT id_posts FROM posts WHERE id_posts IN (SELECT post_id as id_posts FROM specific_post order by id_specific_post)";
 } */
 
@@ -88,7 +95,7 @@ posts.isImage as isImage,   posts.image_url as image_url,  posts.type as type,
 posts.id_categories as category, posts.report_abuse_count, 
 posts.id_user_name_random as id_user_name_random, groups.name as name,  
 (SELECT feeling_likes FROM feeling_category WHERE id_user_name= $user_id and 
-feeling_category.id_posts = posts.id_posts) as feeling_like, (SELECT count(feeling_likes) 
+feeling_category.id_posts = posts.id_posts limit 1) as feeling_like, (SELECT count(feeling_likes) 
 FROM feeling_category WHERE feeling_category.id_posts = posts.id_posts and feeling_likes = 1) as likes,  
 (SELECT count(feeling_likes) FROM feeling_category WHERE feeling_category.id_posts = posts.id_posts 
 and feeling_likes = 2) as hug, (SELECT count(post_comments.id_post_comments) as comments 

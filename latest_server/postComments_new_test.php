@@ -1,11 +1,11 @@
 <?php
-require_once("init_new_config.php");
+require_once("init_new_config_local.php");
 require "color_array.php";
 
 global $lightColors;
 global $darkColors;
 
-$id_user_name = isset($_POST['id_user_name']) ? mysqli_real_escape_string($con, $_POST['id_user_name']) : "";  // id of the user who commented the post
+$id_user_name = isset($_GET['id_user_name']) ? mysqli_real_escape_string($con, $_GET['id_user_name']) : "";  // id of the user who commented the post
 
 $blockUsersql = "SELECT id_user_name FROM candid_database.block_user_from_app where id_user_name ='$id_user_name' ";
 
@@ -21,7 +21,7 @@ if (mysqli_num_rows($checkBlock)>0){
 $sql = "SELECT id_user_name,user_name_random.id_user_name_random as id_user_name_random, 
 				user_name_random.username as username,
 				user_name_random.avatar_url as avatar_url FROM posts LEFT JOIN user_name_random 
-				ON posts.id_user_name_random= user_name_random.id_user_name_random WHERE id_posts='" . intval($_POST['id_posts']) . "' LIMIT 1";
+				ON posts.id_user_name_random= user_name_random.id_user_name_random WHERE id_posts='" . intval($_GET['id_posts']) . "' LIMIT 1";
 
 $sql = mysqli_query($con, $sql);
 if (mysqli_num_rows($sql)) {
@@ -29,7 +29,7 @@ if (mysqli_num_rows($sql)) {
 
 
     // If the commentor is the original poster himself, use the already assigned random name
-    if ($random_row[0] == $_POST['id_user_name']) {
+    if ($random_row[0] == $_GET['id_user_name']) {
 
         $id_user_name_random = $random_row[1];
         $username = $random_row[2];
@@ -42,7 +42,7 @@ if (mysqli_num_rows($sql)) {
 				user_name_random.username as username,
 				user_name_random.avatar_url as avatar_url FROM post_comments LEFT JOIN user_name_random 
 				ON post_comments.id_user_name_random= user_name_random.id_user_name_random
-				 WHERE id_posts='" . intval($_POST['id_posts']) . "' AND id_user_name='" . intval($_POST['id_user_name']) . "' LIMIT 1";
+				 WHERE id_posts='" . intval($_GET['id_posts']) . "' AND id_user_name='" . intval($_GET['id_user_name']) . "' LIMIT 1";
 
         $sql = mysqli_query($con, $sql);
 
@@ -61,7 +61,7 @@ if (mysqli_num_rows($sql)) {
             $sql = "SELECT post_comment_reply.id_user_name_random as id_user_name_random,
 				user_name_random.username as username,
 				user_name_random.avatar_url as avatar_url FROM post_comment_reply LEFT JOIN user_name_random 
-				ON post_comment_reply.id_user_name_random = user_name_random.id_user_name_random WHERE id_posts='" . intval($_POST['id_posts']) . "' AND id_user_name='" . intval($_POST['id_user_name']) . "' LIMIT 1";
+				ON post_comment_reply.id_user_name_random = user_name_random.id_user_name_random WHERE id_posts='" . intval($_GET['id_posts']) . "' AND id_user_name='" . intval($_GET['id_user_name']) . "' LIMIT 1";
 
             $sql = mysqli_query($con, $sql);
 
@@ -77,9 +77,9 @@ if (mysqli_num_rows($sql)) {
                 /* If not,
                     Obtain a new random  id_user_name_random from DB */
                 $sql = "SELECT user_name_random.id_user_name_random as id_user_name_random FROM user_name_random WHERE user_name_random.id_user_name_random 
-NOT IN ( SELECT id_user_name_random FROM posts WHERE id_posts='" . intval($_POST['id_posts']) . "') 
-UNION ( SELECT id_user_name_random FROM post_comments WHERE id_posts='" . intval($_POST['id_posts']) . "' ) 
-UNION ( SELECT id_user_name_random FROM post_comment_reply WHERE id_posts='" . intval($_POST['id_posts']) . "' )  ORDER BY RAND() LIMIT 1";
+NOT IN ( SELECT id_user_name_random FROM posts WHERE id_posts='" . intval($_GET['id_posts']) . "') 
+UNION ( SELECT id_user_name_random FROM post_comments WHERE id_posts='" . intval($_GET['id_posts']) . "' ) 
+UNION ( SELECT id_user_name_random FROM post_comment_reply WHERE id_posts='" . intval($_GET['id_posts']) . "' )  ORDER BY RAND() LIMIT 1";
 
                 $sql = mysqli_query($con, $sql);
                 $random_row = mysqli_fetch_row($sql);
@@ -130,14 +130,15 @@ $light_color = $lightColors[$randomNumber];
 $dark_color = $darkColors[$randomNumber];
 
 
-$id_user_name = isset($_POST['id_user_name']) ? mysqli_real_escape_string($con, $_POST['id_user_name']) : "";  // id of the user who commented the post
-$id_post_user_name = isset($_POST['id_post_user_name']) ? mysqli_real_escape_string($con, $_POST['id_post_user_name']) : "";  // who posted the post
-$id_posts = isset($_POST['id_posts']) ? mysqli_real_escape_string($con, $_POST['id_posts']) : ""; // id of the post
-$message = isset($_POST['message']) ? mysqli_real_escape_string($con, $_POST['message']) : "";
-$token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token']) : "0";
+$id_user_name = isset($_GET['id_user_name']) ? mysqli_real_escape_string($con, $_GET['id_user_name']) : "";  // id of the user who commented the post
+$id_post_user_name = isset($_GET['id_post_user_name']) ? mysqli_real_escape_string($con, $_GET['id_post_user_name']) : "";  // who posted the post
+$id_posts = isset($_GET['id_posts']) ? mysqli_real_escape_string($con, $_GET['id_posts']) : ""; // id of the post
+$message = isset($_GET['message']) ? mysqli_real_escape_string($con, $_GET['message']) : "";
+$token = isset($_GET['token']) ? mysqli_real_escape_string($con, $_GET['token']) : "0";
 
 
-$sql = mysqli_query($con, "INSERT INTO `post_comments` (`id_user_name`, `id_posts`,  `id_post_user_name` , `id_user_name_random`, `message`, `comment_time`,`level`,`random_color_light`,`random_color_dark`) VALUES ('" . intval($id_user_name) . "', '" . intval($id_posts) . "', '" . intval($id_post_user_name) . "' , '" . intval($id_user_name_random) . "', '$message','$post_date','0','$light_color','$dark_color')") or die(mysqli_error($con));
+$sql = mysqli_query($con, "INSERT INTO `post_comments` (`id_user_name`, `id_posts`,  `id_post_user_name` , `id_user_name_random`, `message`, `comment_time`,`level`,`random_color_light`,`random_color_dark`) VALUES 
+('" . intval($id_user_name) . "', '" . intval($id_posts) . "', '" . intval($id_post_user_name) . "' , '" . intval($id_user_name_random) . "', '$message','$post_date','0','$light_color','$dark_color')") or die(mysqli_error($con));
 
 
 if ($sql){

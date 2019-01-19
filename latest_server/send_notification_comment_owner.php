@@ -32,12 +32,12 @@ function send_notification_to_comment_owner($user_id, $post_id, $topic, $id_post
         $id_user_name_random = rand(1,120);
         $id_user_name_randomreceiver = rand(1,120);
 
-     // live code   save_notification($user_id, $id_user_name, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
-        save_notification($user_id, $user_id, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
+     // live code
+     //   save_notification($user_id, $user_id, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
 
 
       // live code  $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$id_user_name'")or die(mysqli_error($con));
-        $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$user_id'")or die(mysqli_error($con));
+        $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$id_user_name'")or die(mysqli_error($con));
 
         $pushnotificationToken = $getToken->fetch_object()->pushnotificationToken;
 
@@ -92,19 +92,16 @@ function send_notification_to_comment_owner($user_id, $post_id, $topic, $id_post
 
         // live code
           if ($user_id != $id_user_name){
-          //    $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
+              $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
+              save_notification($user_id, $id_user_name, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
+
           }
 
         $topic_string = "/topics/" ."POST"."_". $post_id; // "topic/POST_123
 
-
-        $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
-
         $fcm_result_broadcast = sendFCM($topic_string , $notificationTopic, $textNotificationTopic);
 
-
-        $resp = array('userId' => $getUserId);
-
+        $resp = array('success' => true);
 
     }
     return json_encode($resp);

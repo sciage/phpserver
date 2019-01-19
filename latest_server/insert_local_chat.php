@@ -6,20 +6,20 @@
  * Time: 11:47 AM
  */
 
-require "init_new_config_local.php";
+require "init_new_config.php";
 require_once("update_user_token.php");
 require_once("send_notification_receiver_owner.php");
 
+$user_one = isset($_POST['user_one']) ? mysqli_real_escape_string($con, $_POST['user_one']) : ""; // sender ID
+$user_two = isset($_POST['user_two']) ? mysqli_real_escape_string($con, $_POST['user_two']) : ""; // receiver ID
+$id_posts = isset($_POST['id_posts']) ? mysqli_real_escape_string($con, $_POST['id_posts']) : "";
+$token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token']) : "insert_local_chat";
 
-$user_one=mysqli_real_escape_string($con,$_GET['user_one']); // sender ID
-$user_two=mysqli_real_escape_string($con,$_GET['user_two']); // receiver ID
-$id_posts=mysqli_real_escape_string($con,$_GET['id_posts']); // receiver ID
-$token = isset($_GET['token']) ? mysqli_real_escape_string($con, $_GET['token']) : "0";
 
+$chatText = isset($_POST['chatText']) ? mysqli_real_escape_string($con, $_POST['chatText']) : ""; // sender ID
+$chatImage = isset($_POST['chatImage']) ? mysqli_real_escape_string($con, $_POST['chatImage']) : ""; // sender ID
+$random_user_two = isset($_POST['random_user_two']) ? mysqli_real_escape_string($con, $_POST['random_user_two']) : ""; // sender ID
 
-$chatText=mysqli_real_escape_string($con,$_GET['chatText']);
-$chatImage=mysqli_real_escape_string($con,$_GET['chatImage']);
-$random_user_two=mysqli_real_escape_string($con,$_GET['random_user_two']); // second user random is given in API.
 // FIrst userID is generated.
 $random_user_one = rand(1,120);
 
@@ -36,14 +36,14 @@ if (mysqli_num_rows($q) > 0) {
 } else {
     if($user_one!=$user_two)
     {
-        $checkConversation = mysqli_query($con, "SELECT id_conversation, senderId, senderRandom, receiverId, receiverRandom FROM conversation WHERE 
+        $checkConversation02 = mysqli_query($con, "SELECT * FROM conversation WHERE 
 	((senderId='$user_one' and receiverId='$user_two') or 
     (senderId='$user_two' and receiverId='$user_one')) AND id_posts = '$id_posts'  ");
 
 
-        if(mysqli_num_rows($checkConversation)>0) {
+        if(mysqli_num_rows($checkConversation02)>0) {
 
-            while ($row = mysqli_fetch_assoc($checkConversation)) {
+            while ($row = mysqli_fetch_assoc($checkConversation02)) {
                 $senderId = $row['senderId'];
                 $senderRandom = $row['senderRandom'];
                 $receiverId = $row['receiverId'];
@@ -58,17 +58,27 @@ if (mysqli_num_rows($q) > 0) {
             if ($senderId == $user_one){ // $user_one is user who is sending data. we need other user randomID
                 $randomUsersIdOne = $receiverRandom; // other user random ID
 
-                $getreceiverData = mysqli_query ($con,"SELECT username FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
+                $getreceiverData = mysqli_query ($con,"SELECT username, avatar_url FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
 
-                $randomusername = $getreceiverData->fetch_object()->username;
+                if (mysqli_num_rows($getreceiverData) > 0) {
+                    while ($row = mysqli_fetch_assoc($getreceiverData)) {
+                        $randomusername = $row['username'];
+                        $avatar_url = $row['avatar_url'];
+                    }
+                }
+
 
             } else if ($receiverId = $user_one){
                 $randomUsersIdOne = $senderRandom; // if we are receiverId, then senderRandom is other user
 
-                $getreceiverData = mysqli_query ($con,"SELECT username FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
+                $getreceiverData = mysqli_query ($con,"SELECT username, avatar_url FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
 
-
-                $randomusername = $getreceiverData->fetch_object()->username;
+                if (mysqli_num_rows($getreceiverData) > 0) {
+                    while ($row = mysqli_fetch_assoc($getreceiverData)) {
+                        $randomusername = $row['username'];
+                        $avatar_url = $row['avatar_url'];
+                    }
+                }
 
             }
 
@@ -77,7 +87,7 @@ if (mysqli_num_rows($q) > 0) {
 
             $id_conversation_reply = insertChatReply($id_conversation, $randomUsersIdOne, $chatText, $chatImage, $user_one, $post_date, $con);
 
-            $send_notification_chat_owner = send_notification_to_chat_owner($id_conversation_reply, $chatText, $chatImage, $id_posts, $topic, $user_two, $randomusername, $randomUsersIdOne,  $user_one);
+            $send_notification_chat_owner = send_notification_to_chat_owner($id_conversation_reply, $chatText, $chatImage, $id_posts, $topic, $user_two, $randomusername, $avatar_url, $randomUsersIdOne,  $user_one);
 
             if ($id_conversation_reply) {
                 $resp = array('success' => true, 'blocked' => false);
@@ -104,25 +114,40 @@ if (mysqli_num_rows($q) > 0) {
             if ($senderId == $user_one){ // $user_one is user who is sending data. we need other user randomID
                 $randomUsersIdOne = $receiverRandom; // other user random ID
 
-                $getreceiverData = mysqli_query ($con,"SELECT username FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
+                $getreceiverData = mysqli_query ($con,"SELECT username, avatar_url FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
 
-                $randomusername = $getreceiverData->fetch_object()->username;
+
+                if (mysqli_num_rows($getreceiverData) > 0) {
+                    while ($row = mysqli_fetch_assoc($getreceiverData)) {
+                        $randomusername = $row['username'];
+                        $avatar_url = $row['avatar_url'];
+                    }
+                }
+
 
             } else if ($receiverId = $user_one){
                 $randomUsersIdOne = $senderRandom; // if we are receiverId, then senderRandom is other user
 
-                $getreceiverData = mysqli_query ($con,"SELECT username FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
+                $getreceiverData = mysqli_query ($con,"SELECT username, avatar_url FROM candid_database.user_name_chat_random where id_user_name_random = '$randomUsersIdOne'")or die(mysqli_error($con));
+
+                if (mysqli_num_rows($getreceiverData) > 0) {
+                    while ($row = mysqli_fetch_assoc($getreceiverData)) {
+                        $randomusername = $row['username'];
+                        $avatar_url = $row['avatar_url'];
+                    }
+                }
 
 
-                $randomusername = $getreceiverData->fetch_object()->username;
 
             }
 
             $topic = "Someone sent you a Private Message";
 
+
+            //    $id_conversation, $randomUsersIdOne, $chatText, $chatImage, $user_one, $post_date, $con
             $id_conversation_reply = insertChatReply($id_conversation, $random_user_one, $chatText, $chatImage, $user_one, $post_date, $con);
 
-            $send_notification_chat_owner = send_notification_to_chat_owner($id_conversation_reply, $chatText, $chatImage, $id_posts, $topic, $user_two, $randomusername, $randomUsersIdOne,  $user_one);
+            $send_notification_chat_owner = send_notification_to_chat_owner($id_conversation_reply, $chatText, $chatImage, $id_posts, $topic, $user_two, $randomusername, $avatar_url, $randomUsersIdOne,  $user_one);
 
 
             if ($id_conversation_reply) {
@@ -142,7 +167,7 @@ if (mysqli_num_rows($q) > 0) {
 
 function insertChatReply($id_conversation, $randomUsersIdOne, $chatText, $chatImage, $user_one, $post_date, $con){
 
-    $q= mysqli_query($con,"INSERT INTO conversation_reply (chatText, chatImage, id_user_name, id_user_name_random, time, id_conversation, unread) VALUES 
+    $q= mysqli_query($con,"INSERT INTO `conversation_reply` (`chatText`, `chatImage`, `id_user_name`, `id_user_name_random`, `time`, `id_conversation`, `unread`) VALUES 
         ('$chatText','$chatImage','$user_one','$randomUsersIdOne','$post_date','$id_conversation', 1)") or die(mysqli_error($con));
 
     $id_conversation_reply = mysqli_insert_id($con);

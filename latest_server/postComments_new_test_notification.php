@@ -15,6 +15,10 @@ $token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token'
 
     $send_notification_post_owner = send_notification_to_post_owner($id_posts, $topic, $id_user_name); // it returns back user ID
 
+$resp = array('success' => true);
+
+echo json_encode($resp);
+
     die();
 
 ?>

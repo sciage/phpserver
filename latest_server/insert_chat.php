@@ -33,7 +33,8 @@ $post_date = date_timestamp_get($date) * 1000;
 // send notification to post owner
         //($post_id, $topic, $id_user_name, $RANDOM_RECEIVER_USERNAME, $RANDOM_RECEIVER_ID, $RANDOM_SENDER_ID, $RECEIVER_USERID)
 
-        $send_notification_comment_owner = send_notification_to_chat_owner($chatText, $chatImage, $id_posts, $topic, $senderId, $receiverAnonymousUsername, $receiverAnonymous, $senderAnonymous, $receiverId); // it returns back user ID
+        //$id_conversation_reply, $chatText, $chatImage, $post_id, $topic, $id_user_name, $RANDOM_RECEIVER_USERNAME, $avatar_url, $RANDOM_RECEIVER_ID, $RECEIVER_USERID
+        $send_notification_comment_owner = send_notification_to_chat_owner($id_conversation_reply, $chatText, $chatImage, $id_posts, $topic, $senderId, $receiverAnonymousUsername, $receiverAnonymous, $senderAnonymous, $receiverId); // it returns back user ID
 
 
 

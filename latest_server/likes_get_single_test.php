@@ -2,7 +2,7 @@
 
 require_once("init_new_config.php");
 require_once("update_user_token.php");
-require_once("send_notification_post_owner.php");
+require_once("send_notification_post_owner_like.php");
 
 /*
 $user_id = isset($_POST['user_id']) ? mysqli_real_escape_string($con, $_POST['user_id']) : ""; // user sending like
@@ -13,11 +13,11 @@ $token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token'
 $user_id = isset($_POST['user_id']) ? mysqli_real_escape_string($con, $_POST['user_id']) : ""; // user sending like
 $post_id = isset($_POST['post_id']) ? mysqli_real_escape_string($con, $_POST['post_id']) : "";
 $like = isset($_POST['like']) ? mysqli_real_escape_string($con, $_POST['like']) : "0";
-$token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token']) : "0";
+$token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token']) : "likes_get_single_test";
 
 
 
-$checkdate = mysqli_query ($con,"SELECT 'id_feeling_category' FROM `feeling_category` WHERE `id_posts`='$post_id' AND `id_user_name`='$user_id'")or die(mysqli_error($con));
+$checkdate = mysqli_query ($con,"SELECT id_feeling_category FROM `feeling_category` WHERE `id_posts`='$post_id' AND `id_user_name`='$user_id'")or die(mysqli_error($con));
 if(mysqli_num_rows($checkdate) > 0){
 
     $row = mysqli_fetch_row($checkdate);
@@ -29,7 +29,6 @@ if(mysqli_num_rows($checkdate) > 0){
 
         $topic = "Someone Liked your post";
 
-// send notification to post owner
         $send_notification_post_ower = send_notification_to_post_owner($post_id, $topic, $user_id);
     }
 

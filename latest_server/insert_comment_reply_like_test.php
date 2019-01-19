@@ -10,7 +10,7 @@ $id_post_comment_reply = isset($_POST['id_post_comment_reply']) ? mysqli_real_es
 $id_user_name = isset($_POST['id_user_name']) ? mysqli_real_escape_string($con, $_POST['id_user_name']) : "";
 $likes = isset($_POST['likes']) ? mysqli_real_escape_string($con, $_POST['likes']) : "";
 $post_id = isset($_POST['id_posts']) ? mysqli_real_escape_string($con, $_POST['id_posts']) : "";
-$token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token']) : "0";
+$token = isset($_POST['token']) ? mysqli_real_escape_string($con, $_POST['token']) : "insert_comment_reply_like_test";
 
 $checkLike = mysqli_query($con, "SELECT id_post_comment_reply_likes FROM `post_comment_reply_likes`  where `id_post_comment_reply` = '" . $id_post_comment_reply . "' and `id_user_name` = '" . $id_user_name . "'");
 

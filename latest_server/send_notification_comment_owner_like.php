@@ -74,10 +74,10 @@ function send_notification_to_comment_owner($user_id, $post_id, $topic, $id_post
 
         // live code
         if ($user_id != $id_user_name){
-            //    $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
+            $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
+            save_notification($user_id, $id_user_name, $topic, $post_date, $post_id, $id_user_name_random, $id_user_name_randomreceiver);
         }
 
-        $fcm_result = sendFCM($pushnotificationToken , $notification, $textNotification);
 
         $resp = array('userId' => $getUserId);
 

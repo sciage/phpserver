@@ -6,8 +6,6 @@
  * Time: 7:35 AM
  */
 
-//require_once("init_new_config.php");
-//require_once("init_new_config.php");
 require_once("init_new_config.php");
 require_once("send_notif.php");
 require_once("save_notification.php");
@@ -18,7 +16,7 @@ function send_notification_to_post_owner($post_id, $topic, $user_id){
     global $con;
 
 
-    $getUserId = mysqli_query ($con,"SELECT id_user_name, groups.name as group_name, text_status FROM candid_database.posts LEFT JOIN groups ON  groups.group_id = posts.group_id where id_posts = '$post_id'")or die(mysqli_error($con));
+    $getUserId = mysqli_query ($con,"SELECT id_user_name, text_status FROM candid_database.posts where id_posts = '$post_id'")or die(mysqli_error($con));
 
     if (mysqli_num_rows($getUserId) > 0) {
         while($row = mysqli_fetch_assoc($getUserId)){
@@ -43,11 +41,7 @@ function send_notification_to_post_owner($post_id, $topic, $user_id){
             $text_status_new =    substr($text_status, 0, 40) . "...";
         }
 
-       // $id_user_name = $getUserId->fetch_object()->id_user_name;
-       // $groups_name = $getUserId->fetch_object()->group_name;
 
-    // live code    $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$id_user_name'")or die(mysqli_error($con));
-        // demo code for testing
         $getToken = mysqli_query ($con,"SELECT pushnotificationToken FROM candid_database.user_name where `id_user_name` = '$id_user_name'")or die(mysqli_error($con));
 
         $pushnotificationToken = $getToken->fetch_object()->pushnotificationToken;
@@ -64,7 +58,6 @@ function send_notification_to_post_owner($post_id, $topic, $user_id){
         );
 
         $topic02 =  "Someone Commented in this post";
-
 
         $notificationTopic = array (
             "title" => $topic02,
@@ -102,13 +95,9 @@ function send_notification_to_post_owner($post_id, $topic, $user_id){
 
         $topic_string = "/topics/" ."POST"."_". $post_id; // "topic/POST_123
 
-
-        // todo testing code below
         $fcm_result_broadcast = sendFCM($topic_string , $notificationTopic, $textNotificationTopic);
 
-
-        $resp = array('userId' => $id_user_name);
-
+        $resp = array('success' => true);
 
     }
     return json_encode($resp);

@@ -180,7 +180,7 @@ WHERE c.id_posts = $id_posts ORDER BY c.comment_time asc ";
     $topic02 =  "Someone Commented in this post in ";
 
 // send notification to post owner
-    $send_notification_post_owner = send_notification_to_post_owner($id_posts, $topic); // it returns back user ID
+    $send_notification_post_owner = send_notification_to_post_owner($id_posts, $userId, $topic); // it returns back user ID
 
     $getData = json_decode($send_notification_post_owner);
 
